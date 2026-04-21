@@ -1,0 +1,639 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--orange:#FF5500;--black:#0A0A0A;--surface:#F7F7F5;--card:#fff;--border:rgba(0,0,0,0.08);--text:#0A0A0A;--muted:#6B6B6B;--hint:#A0A0A0;--radius:16px;--rsm:10px;--green:#1A6B3C;--green-bg:#EDFAF3;--amber:#7A4900;--amber-bg:#FFF8E6;}
+body{font-family:var(--font-sans),system-ui,sans-serif;background:var(--color-background-tertiary);}
+.phone{width:375px;margin:0 auto;background:var(--surface);border-radius:40px;border:1.5px solid var(--color-border-secondary);overflow:hidden;min-height:720px;position:relative;}
+.screen{display:none;flex-direction:column;min-height:720px;background:var(--surface);}
+.screen.active{display:flex;}
+.sbar{background:var(--black);padding:12px 20px 8px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.sbar span{color:#fff;font-size:11px;font-weight:500;}
+.topbar{background:var(--card);border-bottom:0.5px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.ttitle{font-size:15px;font-weight:500;color:var(--text);flex:1;}
+.back{width:32px;height:32px;border-radius:var(--rsm);background:var(--surface);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);}
+.content{flex:1;overflow-y:auto;padding:16px;}
+.bnav{background:var(--card);border-top:0.5px solid var(--border);display:flex;padding:8px 0 12px;flex-shrink:0;}
+.ntab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px;border:none;background:none;}
+.ntab span{font-size:10px;font-weight:500;}
+.ntab svg{width:20px;height:20px;}
+.ntab.on svg{color:var(--orange);}
+.ntab.on span{color:var(--orange);}
+.ntab:not(.on) svg{color:var(--hint);}
+.ntab:not(.on) span{color:var(--hint);}
+.btnp{width:100%;padding:14px;background:var(--orange);color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:500;cursor:pointer;}
+.btns{width:100%;padding:14px;background:var(--surface);color:var(--text);border:0.5px solid var(--border);border-radius:var(--radius);font-size:15px;font-weight:500;cursor:pointer;}
+.inp{width:100%;padding:12px 14px;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--rsm);font-size:14px;color:var(--text);outline:none;font-family:inherit;}
+.inp:focus{border-color:var(--orange);}
+.lbl{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px;display:block;}
+.card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;}
+.cardd{background:var(--black);border-radius:var(--radius);padding:16px;}
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:500;}
+.bnew{background:#EBF2FF;color:#1A4BAA;}
+.bprog{background:var(--amber-bg);color:var(--amber);}
+.bdone{background:var(--green-bg);color:var(--green);}
+.bopen{background:#FFF0EB;color:#CC3D00;}
+.bcancl{background:#FFEAEA;color:#AA1A1A;}
+.slbl{font-size:11px;font-weight:500;color:var(--hint);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;}
+.row{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--card);border:0.5px solid var(--border);border-radius:var(--radius);cursor:pointer;}
+.row:active{transform:scale(.98);}
+.ico{width:44px;height:44px;border-radius:var(--rsm);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.tabs{display:flex;background:var(--surface);border-radius:var(--rsm);padding:3px;gap:2px;margin-bottom:14px;}
+.tbtn{flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:500;cursor:pointer;background:none;color:var(--muted);}
+.tbtn.on{background:var(--card);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.sc{background:var(--card);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;}
+.sn{font-size:22px;font-weight:500;color:var(--orange);}
+.sl{font-size:11px;color:var(--muted);margin-top:2px;}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:40px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--border);background:var(--card);}
+.pill.on{background:var(--orange);color:#fff;border-color:var(--orange);}
+.pill:not(.on){color:var(--muted);}
+svg.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;}
+.pbar{height:5px;background:var(--surface);border-radius:4px;overflow:hidden;margin-top:6px;}
+.pfill{height:100%;background:var(--orange);border-radius:4px;}
+.split-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:0.5px solid var(--border);}
+.split-row:last-child{border-bottom:none;font-weight:500;font-size:14px;}
+.toggle-wrap{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--card);border:0.5px solid var(--border);border-radius:var(--rsm);margin-bottom:10px;}
+.toggle{width:44px;height:24px;border-radius:12px;background:var(--orange);border:none;cursor:pointer;position:relative;transition:background .2s;}
+.toggle::after{content:'';position:absolute;top:3px;left:22px;width:18px;height:18px;background:#fff;border-radius:50%;transition:left .2s;}
+.toggle.off{background:var(--border);}
+.toggle.off::after{left:3px;}
+</style>
+
+<h2 class="sr-only">Errandeck vendor portal — onboarding, order management, and wallet</h2>
+
+<div id="root">
+<div class="phone">
+
+<!-- ══════ VENDOR ONBOARDING WELCOME ══════ -->
+<div class="screen active" id="sv-welcome">
+  <div style="background:var(--black);flex:1;display:flex;flex-direction:column;">
+    <div style="padding:48px 28px 0;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <div style="width:36px;height:36px;background:var(--orange);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+          <svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <span style="color:#fff;font-size:20px;font-weight:500;">Errandeck</span>
+        <span style="background:rgba(255,85,0,.25);color:var(--orange);font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;margin-left:2px;">For Vendors</span>
+      </div>
+      <h1 style="color:#fff;font-size:26px;font-weight:500;line-height:1.25;margin:20px 0 8px;">Bring your store<br>to every errand.</h1>
+      <p style="color:rgba(255,255,255,.5);font-size:13px;line-height:1.6;">Customers on Errandeck will order from you. Your Tasker delivers. Payment lands directly in your wallet.</p>
+    </div>
+    <div style="background:var(--surface);border-radius:28px 28px 0 0;margin-top:28px;padding:24px;flex:1;">
+      <p class="slbl">Who is this for?</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px;">
+        <div style="padding:10px 6px;background:var(--card);border:0.5px solid var(--border);border-radius:var(--rsm);text-align:center;font-size:11px;color:var(--muted);">🍽️<br>Restaurant</div>
+        <div style="padding:10px 6px;background:var(--card);border:0.5px solid var(--border);border-radius:var(--rsm);text-align:center;font-size:11px;color:var(--muted);">💊<br>Pharmacy</div>
+        <div style="padding:10px 6px;background:var(--card);border:0.5px solid var(--border);border-radius:var(--rsm);text-align:center;font-size:11px;color:var(--muted);">🛒<br>Supermarket</div>
+        <div style="padding:10px 6px;background:var(--card);border:0.5px solid var(--border);border-radius:var(--rsm);text-align:center;font-size:11px;color:var(--muted);">👕<br>Dry Cleaner</div>
+        <div style="padding:10px 6px;background:var(--card);border:0.5px solid var(--border);border-radius:var(--rsm);text-align:center;font-size:11px;color:var(--muted);">✂️<br>Barbershop</div>
+        <div style="padding:10px 6px;background:var(--card);border:0.5px solid var(--border);border-radius:var(--rsm);text-align:center;font-size:11px;color:var(--muted);">🏪<br>Any Store</div>
+      </div>
+      <button class="btnp" onclick="go('sv-register')">Register your business</button>
+      <button class="btns" style="margin-top:8px;" onclick="go('sv-dashboard')">Sign in</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ VENDOR REGISTER ══════ -->
+<div class="screen" id="sv-register">
+  <div class="sbar"><span>9:41</span><span>▲▲▲ 100%</span></div>
+  <div class="topbar">
+    <button class="back" onclick="go('sv-welcome')">←</button>
+    <div>
+      <div class="ttitle">Register business</div>
+      <div style="font-size:11px;color:var(--hint);">Step <span id="reg-step-label">1</span> of 3</div>
+    </div>
+  </div>
+  <div style="height:3px;background:var(--surface);"><div id="reg-progress" style="width:33%;height:100%;background:var(--orange);border-radius:2px;transition:width .3s;"></div></div>
+
+  <div class="content" style="padding-bottom:90px;">
+
+    <!-- Step 1: Business info -->
+    <div id="reg-s1">
+      <h2 style="font-size:18px;font-weight:500;margin-bottom:4px;">Business details</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">Tell us about your store</p>
+      <div style="margin-bottom:12px;"><label class="lbl">Business name</label><input class="inp" value="Mama Titi's Kitchen" placeholder="e.g. Mama Titi's Kitchen"/></div>
+      <div style="margin-bottom:12px;">
+        <label class="lbl">Business type</label>
+        <select class="inp" id="biz-type">
+          <option>Restaurant / Food</option>
+          <option>Pharmacy / Chemist</option>
+          <option>Supermarket / Grocery</option>
+          <option>Dry Cleaner / Laundry</option>
+          <option>Barbershop / Salon</option>
+          <option>Electronics / Gadgets</option>
+          <option>Other retail store</option>
+        </select>
+      </div>
+      <div style="margin-bottom:12px;"><label class="lbl">Business address (Lagos)</label><div style="position:relative;"><span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;">📍</span><input class="inp" style="padding-left:34px;" value="14 Awolowo Rd, Ikoyi, Lagos"/></div></div>
+      <div style="margin-bottom:12px;"><label class="lbl">Phone number</label><input class="inp" value="0802 345 6789"/></div>
+      <div style="margin-bottom:12px;"><label class="lbl">Business email</label><input class="inp" value="mamatiti@gmail.com" type="email"/></div>
+    </div>
+
+    <!-- Step 2: Verification -->
+    <div id="reg-s2" style="display:none;">
+      <h2 style="font-size:18px;font-weight:500;margin-bottom:4px;">Business verification</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">Helps clients trust your store</p>
+      <div style="margin-bottom:12px;"><label class="lbl">CAC Registration number (optional)</label><input class="inp" placeholder="RC123456"/></div>
+      <div style="margin-bottom:12px;"><label class="lbl">Business owner's NIN / BVN</label><input class="inp" placeholder="1234567890" value="7730112984"/></div>
+      <div style="margin-bottom:12px;">
+        <label class="lbl">Upload storefront photo</label>
+        <div id="store-photo" onclick="addStorePhoto()" style="border:1.5px dashed var(--border);border-radius:var(--rsm);padding:20px;text-align:center;cursor:pointer;">
+          <div style="font-size:22px;margin-bottom:5px;">📷</div>
+          <p style="font-size:12px;color:var(--muted);">Tap to upload photo of your store</p>
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label class="lbl">Opening hours</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div><label class="lbl" style="font-size:11px;">Opens</label><input class="inp" value="8:00 AM"/></div>
+          <div><label class="lbl" style="font-size:11px;">Closes</label><input class="inp" value="10:00 PM"/></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Payout setup -->
+    <div id="reg-s3" style="display:none;">
+      <h2 style="font-size:18px;font-weight:500;margin-bottom:4px;">Payout setup</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">Where should your earnings go?</p>
+      <div style="background:var(--amber-bg);border:0.5px solid #F5C875;border-radius:var(--rsm);padding:12px 14px;margin-bottom:16px;">
+        <p style="font-size:12px;color:var(--amber);font-weight:500;">How vendor payments work</p>
+        <p style="font-size:11px;color:var(--amber);margin-top:4px;line-height:1.6;">When a Client orders from your store, the goods cost goes directly into your Errandeck wallet. The Tasker earns separately for delivery. You withdraw anytime.</p>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label class="lbl">Select bank</label>
+        <select class="inp">
+          <option>GTBank</option><option>Access Bank</option><option>First Bank</option>
+          <option>Zenith Bank</option><option>UBA</option><option>OPay</option><option>Kuda Bank</option>
+        </select>
+      </div>
+      <div style="margin-bottom:12px;"><label class="lbl">Account number (NUBAN)</label><input class="inp" placeholder="0123456789" value="0234567821" style="font-family:monospace;letter-spacing:2px;"/></div>
+      <div style="margin-bottom:12px;"><label class="lbl">Account name</label><input class="inp" value="MAMA TITI FOODS LTD" style="text-transform:uppercase;"/></div>
+    </div>
+  </div>
+
+  <div style="padding:12px 16px 20px;background:var(--card);border-top:0.5px solid var(--border);">
+    <button class="btnp" id="reg-next-btn" onclick="regNext()">Continue →</button>
+  </div>
+</div>
+
+<!-- ══════ VENDOR DASHBOARD ══════ -->
+<div class="screen" id="sv-dashboard">
+  <div class="sbar"><span>9:41</span><span>▲▲▲ 100%</span></div>
+  <div style="background:var(--card);padding:14px 16px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:0.5px solid var(--border);">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:38px;height:38px;border-radius:var(--rsm);background:#FFF0EB;display:flex;align-items:center;justify-content:center;font-size:20px;">🍽️</div>
+      <div>
+        <p style="font-size:15px;font-weight:500;">Mama Titi's Kitchen</p>
+        <div style="display:flex;align-items:center;gap:4px;margin-top:1px;">
+          <span style="font-size:10px;background:var(--green-bg);color:var(--green);padding:2px 7px;border-radius:10px;font-weight:500;">✓ Verified</span>
+          <span style="font-size:10px;color:var(--muted);">Restaurant</span>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;background:var(--green-bg);padding:5px 10px;border-radius:20px;cursor:pointer;" onclick="toggleStore()">
+      <div id="store-dot" style="width:6px;height:6px;background:var(--green);border-radius:50%;"></div>
+      <span id="store-status" style="font-size:11px;font-weight:500;color:var(--green);">Open</span>
+    </div>
+  </div>
+
+  <div class="content" style="padding-top:14px;padding-bottom:80px;">
+    <!-- Wallet summary -->
+    <div class="cardd" style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <p style="color:rgba(255,255,255,.5);font-size:12px;margin-bottom:3px;">Wallet balance</p>
+          <p style="color:#fff;font-size:28px;font-weight:500;" id="dash-balance">₦47,350</p>
+          <p style="color:rgba(255,255,255,.4);font-size:11px;margin-top:2px;">3 orders pending settlement</p>
+        </div>
+        <button onclick="go('sv-wallet')" style="padding:8px 14px;background:var(--orange);color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:500;cursor:pointer;">Withdraw</button>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:12px;">
+        <div style="flex:1;background:rgba(255,255,255,.07);border-radius:8px;padding:8px 10px;">
+          <p style="color:rgba(255,255,255,.45);font-size:10px;margin-bottom:2px;">Today</p>
+          <p style="color:#fff;font-size:14px;font-weight:500;">₦12,800</p>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.07);border-radius:8px;padding:8px 10px;">
+          <p style="color:rgba(255,255,255,.45);font-size:10px;margin-bottom:2px;">This week</p>
+          <p style="color:#fff;font-size:14px;font-weight:500;">₦78,500</p>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,.07);border-radius:8px;padding:8px 10px;">
+          <p style="color:rgba(255,255,255,.45);font-size:10px;margin-bottom:2px;">Orders</p>
+          <p style="color:#fff;font-size:14px;font-weight:500;">24</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- New orders alert -->
+    <div id="new-order-alert" style="background:#EBF2FF;border:0.5px solid #B5D4F4;border-radius:var(--rsm);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="go('sv-orders')">
+      <div style="width:8px;height:8px;background:#1A4BAA;border-radius:50%;flex-shrink:0;animation:pulse 1.5s infinite;"></div>
+      <p style="font-size:13px;color:#1A4BAA;font-weight:500;flex:1;">2 new orders waiting — tap to view</p>
+      <span style="font-size:14px;color:#1A4BAA;">→</span>
+    </div>
+    <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}</style>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tbtn on" id="dash-t1" onclick="dashTab(1)">Orders</button>
+      <button class="tbtn" id="dash-t2" onclick="dashTab(2)">Menu / Services</button>
+    </div>
+
+    <!-- Orders panel -->
+    <div id="dash-orders">
+      <p class="slbl">Recent orders</p>
+      <div class="row" style="margin-bottom:8px;" onclick="go('sv-order-detail')">
+        <div class="ico">🛵</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">
+            <p style="font-size:13px;font-weight:500;">Jollof rice × 2, Fried chicken × 1</p>
+            <span class="badge bnew">New</span>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:2px;">Tasker: Emeka O. · Just now</p>
+          <p style="font-size:12px;font-weight:500;color:var(--green);margin-top:3px;">₦5,800 → your wallet</p>
+        </div>
+      </div>
+      <div class="row" style="margin-bottom:8px;" onclick="go('sv-order-detail')">
+        <div class="ico">🛵</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">
+            <p style="font-size:13px;font-weight:500;">Egusi soup + pounded yam × 1</p>
+            <span class="badge bnew">New</span>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:2px;">Tasker: Funke A. · 3 mins ago</p>
+          <p style="font-size:12px;font-weight:500;color:var(--green);margin-top:3px;">₦3,200 → your wallet</p>
+        </div>
+      </div>
+      <div class="row" style="margin-bottom:8px;">
+        <div class="ico">🛵</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">
+            <p style="font-size:13px;font-weight:500;">Chicken suya × 3 portions</p>
+            <span class="badge bprog">Preparing</span>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:2px;">Tasker: Kola B. · 12 mins ago</p>
+          <p style="font-size:12px;font-weight:500;color:var(--green);margin-top:3px;">₦4,500 → your wallet</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="ico" style="opacity:.5;">🛵</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">
+            <p style="font-size:13px;font-weight:500;">Fried rice + turkey × 2</p>
+            <span class="badge bdone">Delivered</span>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:2px;">Tasker: Akin O. · 1 hour ago</p>
+          <p style="font-size:12px;color:var(--muted);margin-top:3px;">₦6,400 — settled</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menu panel -->
+    <div id="dash-menu" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <p class="slbl" style="margin:0;">Your menu items</p>
+        <button onclick="go('sv-add-item')" style="padding:6px 12px;background:var(--orange);color:#fff;border:none;border-radius:var(--rsm);font-size:12px;font-weight:500;cursor:pointer;">+ Add item</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="card" style="display:flex;align-items:center;gap:10px;">
+          <div style="width:48px;height:48px;border-radius:var(--rsm);background:#FFF0EB;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🍚</div>
+          <div style="flex:1;"><p style="font-size:13px;font-weight:500;">Jollof Rice (full plate)</p><p style="font-size:12px;color:var(--orange);font-weight:500;">₦1,500</p></div>
+          <div><div style="width:36px;height:20px;border-radius:10px;background:var(--orange);position:relative;cursor:pointer;"><div style="position:absolute;top:2px;right:2px;width:16px;height:16px;background:#fff;border-radius:50%;"></div></div></div>
+        </div>
+        <div class="card" style="display:flex;align-items:center;gap:10px;">
+          <div style="width:48px;height:48px;border-radius:var(--rsm);background:#FFF0EB;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🍗</div>
+          <div style="flex:1;"><p style="font-size:13px;font-weight:500;">Fried Chicken (2 pieces)</p><p style="font-size:12px;color:var(--orange);font-weight:500;">₦2,000</p></div>
+          <div><div style="width:36px;height:20px;border-radius:10px;background:var(--orange);position:relative;cursor:pointer;"><div style="position:absolute;top:2px;right:2px;width:16px;height:16px;background:#fff;border-radius:50%;"></div></div></div>
+        </div>
+        <div class="card" style="display:flex;align-items:center;gap:10px;">
+          <div style="width:48px;height:48px;border-radius:var(--rsm);background:#FFF0EB;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🥘</div>
+          <div style="flex:1;"><p style="font-size:13px;font-weight:500;">Egusi Soup + Pounded Yam</p><p style="font-size:12px;color:var(--orange);font-weight:500;">₦3,200</p></div>
+          <div><div style="width:36px;height:20px;border-radius:10px;background:var(--surface);border:0.5px solid var(--border);position:relative;cursor:pointer;"><div style="position:absolute;top:2px;left:2px;width:16px;height:16px;background:var(--hint);border-radius:50%;"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bnav">
+    <button class="ntab on">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="ntab" onclick="go('sv-orders')">
+      <svg class="ic" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <span>Orders</span>
+    </button>
+    <button class="ntab" onclick="go('sv-wallet')">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="2"/></svg>
+      <span>Wallet</span>
+    </button>
+    <button class="ntab" onclick="go('sv-settings')">
+      <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      <span>Store</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════ ORDER DETAIL ══════ -->
+<div class="screen" id="sv-order-detail">
+  <div class="sbar"><span>9:41</span><span>▲▲▲ 100%</span></div>
+  <div class="topbar">
+    <button class="back" onclick="go('sv-dashboard')">←</button>
+    <div class="ttitle">Order #ERD-0041</div>
+    <span class="badge bnew">New order</span>
+  </div>
+  <div class="content" style="padding-bottom:90px;">
+    <div class="card" style="margin-bottom:12px;">
+      <p class="slbl">Order items</p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:18px;">🍚</span><p style="font-size:13px;font-weight:500;">Jollof Rice (full plate)</p></div>
+          <div style="text-align:right;"><p style="font-size:12px;color:var(--muted);">× 2</p><p style="font-size:13px;font-weight:500;">₦3,000</p></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+          <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:18px;">🍗</span><p style="font-size:13px;font-weight:500;">Fried Chicken (2 pieces)</p></div>
+          <div style="text-align:right;"><p style="font-size:12px;color:var(--muted);">× 1</p><p style="font-size:13px;font-weight:500;">₦2,000</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment split -->
+    <div class="card" style="margin-bottom:12px;">
+      <p class="slbl">Payment split</p>
+      <div class="split-row"><span style="color:var(--muted);">Client paid total</span><span style="font-weight:500;">₦7,500</span></div>
+      <div class="split-row"><span style="color:var(--muted);">Tasker earns (delivery fee 85%)</span><span style="color:#1A4BAA;">₦1,445</span></div>
+      <div class="split-row"><span style="color:var(--muted);">Platform fee (15%)</span><span style="color:var(--muted);">₦255</span></div>
+      <div class="split-row" style="padding-top:8px;"><span>You receive (goods cost)</span><span style="color:var(--green);">₦5,800</span></div>
+    </div>
+
+    <!-- Tasker info -->
+    <div class="card" style="margin-bottom:12px;display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:50%;background:#FF6B1A20;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--orange);flex-shrink:0;">EO</div>
+      <div style="flex:1;">
+        <p style="font-size:13px;font-weight:500;">Emeka Okonkwo</p>
+        <p style="font-size:11px;color:var(--muted);">Will pick up in ~15 mins</p>
+        <span style="font-size:10px;background:var(--green-bg);color:var(--green);padding:2px 6px;border-radius:4px;font-weight:500;">✓ Verified Tasker</span>
+      </div>
+      <button style="padding:7px 12px;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--rsm);font-size:12px;font-weight:500;cursor:pointer;">Call</button>
+    </div>
+
+    <!-- Special note -->
+    <div style="background:var(--amber-bg);border:0.5px solid #F5C875;border-radius:var(--rsm);padding:10px 14px;margin-bottom:16px;">
+      <p style="font-size:11px;font-weight:500;color:var(--amber);margin-bottom:2px;">Client note</p>
+      <p style="font-size:12px;color:var(--amber);">Please make the rice extra spicy and pack the chicken separately.</p>
+    </div>
+
+    <button class="btnp" style="margin-bottom:8px;" onclick="acceptOrder()">Accept order & start preparing</button>
+    <button class="btns" style="border-color:rgba(220,38,38,.3);color:#DC2626;" onclick="go('sv-dashboard')">Decline order</button>
+  </div>
+</div>
+
+<!-- ══════ ALL ORDERS ══════ -->
+<div class="screen" id="sv-orders">
+  <div class="sbar"><span>9:41</span><span>▲▲▲ 100%</span></div>
+  <div class="topbar"><button class="back" onclick="go('sv-dashboard')">←</button><div class="ttitle">All orders</div></div>
+  <div style="padding:10px 16px 8px;background:var(--card);border-bottom:0.5px solid var(--border);">
+    <div style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;">
+      <div class="pill on">All</div>
+      <div class="pill">New (2)</div>
+      <div class="pill">Preparing</div>
+      <div class="pill">Ready</div>
+      <div class="pill">Delivered</div>
+    </div>
+  </div>
+  <div class="content" style="padding-bottom:20px;">
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+      <div class="row" onclick="go('sv-order-detail')"><div class="ico">🍚</div><div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;gap:6px;"><p style="font-size:13px;font-weight:500;">#ERD-0041 · Jollof × 2, Chicken × 1</p><span class="badge bnew">New</span></div><p style="font-size:11px;color:var(--muted);margin-top:2px;">Emeka O. · Just now · ₦5,800</p></div></div>
+      <div class="row" onclick="go('sv-order-detail')"><div class="ico">🥘</div><div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;gap:6px;"><p style="font-size:13px;font-weight:500;">#ERD-0040 · Egusi + Pounded yam</p><span class="badge bnew">New</span></div><p style="font-size:11px;color:var(--muted);margin-top:2px;">Funke A. · 3 mins · ₦3,200</p></div></div>
+      <div class="row"><div class="ico">🍖</div><div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;gap:6px;"><p style="font-size:13px;font-weight:500;">#ERD-0039 · Suya × 3 portions</p><span class="badge bprog">Preparing</span></div><p style="font-size:11px;color:var(--muted);margin-top:2px;">Kola B. · 12 mins · ₦4,500</p></div></div>
+      <div class="row"><div class="ico" style="opacity:.55;">🍚</div><div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;gap:6px;"><p style="font-size:13px;font-weight:500;">#ERD-0038 · Fried rice + turkey × 2</p><span class="badge bdone">Delivered</span></div><p style="font-size:11px;color:var(--muted);margin-top:2px;">Akin O. · 1 hr ago · ₦6,400</p></div></div>
+      <div class="row"><div class="ico" style="opacity:.55;">🍗</div><div style="flex:1;min-width:0;"><div style="display:flex;justify-content:space-between;gap:6px;"><p style="font-size:13px;font-weight:500;">#ERD-0037 · Chicken + rice × 1</p><span class="badge bdone">Delivered</span></div><p style="font-size:11px;color:var(--muted);margin-top:2px;">Bisi F. · 2 hrs ago · ₦3,500</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ VENDOR WALLET ══════ -->
+<div class="screen" id="sv-wallet">
+  <div class="sbar"><span>9:41</span><span>▲▲▲ 100%</span></div>
+  <div class="topbar"><button class="back" onclick="go('sv-dashboard')">←</button><div class="ttitle">Wallet & Payouts</div></div>
+  <div class="content" style="padding-bottom:80px;">
+    <div class="cardd" style="text-align:center;padding:24px;margin-bottom:14px;">
+      <p style="color:rgba(255,255,255,.5);font-size:12px;margin-bottom:4px;">Available balance</p>
+      <p style="color:#fff;font-size:36px;font-weight:500;" id="vendor-bal">₦47,350.00</p>
+      <p style="color:rgba(255,255,255,.4);font-size:11px;margin-top:3px;">Settled from 24 orders this week</p>
+      <button onclick="doWithdraw()" style="margin-top:16px;padding:10px 28px;background:var(--orange);color:#fff;border:none;border-radius:var(--rsm);font-size:13px;font-weight:500;cursor:pointer;" id="wd-btn">Withdraw to GTBank ****7821</button>
+    </div>
+
+    <div class="sgrid" style="margin-bottom:14px;">
+      <div class="sc"><p class="sn" style="color:var(--green);">₦198,400</p><p class="sl">Total earned (all time)</p></div>
+      <div class="sc"><p class="sn" style="color:#1A4BAA;">₦151,050</p><p class="sl">Total withdrawn</p></div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <p class="slbl">Pending settlement</p>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--border);">
+        <div><p style="font-size:13px;font-weight:500;">#ERD-0041</p><p style="font-size:11px;color:var(--muted);">Jollof × 2, Chicken × 1</p></div>
+        <p style="font-size:13px;font-weight:500;color:var(--amber);">₦5,800 pending</p>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--border);">
+        <div><p style="font-size:13px;font-weight:500;">#ERD-0040</p><p style="font-size:11px;color:var(--muted);">Egusi + Pounded yam</p></div>
+        <p style="font-size:13px;font-weight:500;color:var(--amber);">₦3,200 pending</p>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+        <div><p style="font-size:13px;font-weight:500;">#ERD-0039</p><p style="font-size:11px;color:var(--muted);">Suya × 3</p></div>
+        <p style="font-size:13px;font-weight:500;color:var(--amber);">₦4,500 pending</p>
+      </div>
+    </div>
+
+    <p class="slbl">Recent payouts</p>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;"><div><p style="font-size:13px;font-weight:500;">GTBank ****7821</p><p style="font-size:11px;color:var(--muted);">Today, 8:00 AM · Auto-payout</p></div><p style="font-size:14px;font-weight:500;color:var(--green);">₦12,800</p></div>
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;"><div><p style="font-size:13px;font-weight:500;">GTBank ****7821</p><p style="font-size:11px;color:var(--muted);">Yesterday, 8:00 AM</p></div><p style="font-size:14px;font-weight:500;color:var(--green);">₦18,500</p></div>
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;"><div><p style="font-size:13px;font-weight:500;">GTBank ****7821</p><p style="font-size:11px;color:var(--muted);">2 days ago</p></div><p style="font-size:14px;font-weight:500;color:var(--green);">₦22,400</p></div>
+    </div>
+  </div>
+  <div class="bnav">
+    <button class="ntab" onclick="go('sv-dashboard')"><svg class="ic" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></button>
+    <button class="ntab" onclick="go('sv-orders')"><svg class="ic" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>Orders</span></button>
+    <button class="ntab on"><svg class="ic" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="2"/></svg><span>Wallet</span></button>
+    <button class="ntab" onclick="go('sv-settings')"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg><span>Store</span></button>
+  </div>
+</div>
+
+<!-- ══════ STORE SETTINGS ══════ -->
+<div class="screen" id="sv-settings">
+  <div class="sbar"><span>9:41</span><span>▲▲▲ 100%</span></div>
+  <div class="topbar"><button class="back" onclick="go('sv-dashboard')">←</button><div class="ttitle">Store settings</div></div>
+  <div class="content" style="padding-bottom:80px;">
+    <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--card);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:16px;">
+      <div style="width:52px;height:52px;border-radius:var(--rsm);background:#FFF0EB;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">🍽️</div>
+      <div style="flex:1;"><p style="font-size:15px;font-weight:500;">Mama Titi's Kitchen</p><p style="font-size:12px;color:var(--muted);">Restaurant · Ikoyi, Lagos</p></div>
+      <span style="font-size:11px;background:var(--green-bg);color:var(--green);padding:3px 8px;border-radius:10px;font-weight:500;">✓ Verified</span>
+    </div>
+
+    <p class="slbl">Store availability</p>
+    <div class="toggle-wrap">
+      <div><p style="font-size:13px;font-weight:500;">Store is open</p><p style="font-size:11px;color:var(--muted);">Customers can order from you</p></div>
+      <button class="toggle" id="settings-toggle" onclick="toggleSettings()"></button>
+    </div>
+    <div class="toggle-wrap">
+      <div><p style="font-size:13px;font-weight:500;">Auto-payout daily</p><p style="font-size:11px;color:var(--muted);">Send balance to bank at 8 AM</p></div>
+      <button class="toggle" onclick="this.classList.toggle('off')"></button>
+    </div>
+    <div class="toggle-wrap">
+      <div><p style="font-size:13px;font-weight:500;">Order notifications</p><p style="font-size:11px;color:var(--muted);">Alert me when new order arrives</p></div>
+      <button class="toggle" onclick="this.classList.toggle('off')"></button>
+    </div>
+
+    <p class="slbl" style="margin-top:16px;">Business details</p>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;"><p style="font-size:13px;">Business name</p><p style="font-size:13px;color:var(--muted);">Mama Titi's Kitchen →</p></div>
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;"><p style="font-size:13px;">Address</p><p style="font-size:13px;color:var(--muted);">14 Awolowo Rd →</p></div>
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;"><p style="font-size:13px;">Opening hours</p><p style="font-size:13px;color:var(--muted);">8 AM – 10 PM →</p></div>
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;"><p style="font-size:13px;">Bank account</p><p style="font-size:13px;color:var(--muted);">GTBank ****7821 →</p></div>
+    </div>
+
+    <p class="slbl" style="margin-top:16px;">Performance</p>
+    <div class="sgrid">
+      <div class="sc"><p class="sn">4.7 ⭐</p><p class="sl">Rating</p></div>
+      <div class="sc"><p class="sn">98%</p><p class="sl">Order completion</p></div>
+    </div>
+  </div>
+  <div class="bnav">
+    <button class="ntab" onclick="go('sv-dashboard')"><svg class="ic" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></button>
+    <button class="ntab" onclick="go('sv-orders')"><svg class="ic" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>Orders</span></button>
+    <button class="ntab" onclick="go('sv-wallet')"><svg class="ic" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="2"/></svg><span>Wallet</span></button>
+    <button class="ntab on"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg><span>Store</span></button>
+  </div>
+</div>
+
+<!-- ══════ ADD MENU ITEM ══════ -->
+<div class="screen" id="sv-add-item">
+  <div class="sbar"><span>9:41</span><span>▲▲▲ 100%</span></div>
+  <div class="topbar"><button class="back" onclick="go('sv-dashboard')">←</button><div class="ttitle">Add menu item</div></div>
+  <div class="content" style="padding-bottom:90px;">
+    <div style="margin-bottom:12px;"><label class="lbl">Item name</label><input class="inp" placeholder="e.g. Jollof Rice (full plate)"/></div>
+    <div style="margin-bottom:12px;"><label class="lbl">Price (₦)</label><div style="position:relative;"><span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-weight:500;color:var(--muted);">₦</span><input class="inp" style="padding-left:28px;" placeholder="0" type="number"/></div></div>
+    <div style="margin-bottom:12px;">
+      <label class="lbl">Category</label>
+      <select class="inp"><option>Main dish</option><option>Drinks</option><option>Snacks</option><option>Sides</option><option>Protein</option></select>
+    </div>
+    <div style="margin-bottom:12px;"><label class="lbl">Description (optional)</label><textarea class="inp" rows="3" style="resize:none;" placeholder="Short description of the item..."></textarea></div>
+    <div style="margin-bottom:12px;">
+      <label class="lbl">Item photo</label>
+      <div style="border:1.5px dashed var(--border);border-radius:var(--rsm);padding:20px;text-align:center;cursor:pointer;">
+        <div style="font-size:22px;margin-bottom:5px;">📷</div>
+        <p style="font-size:12px;color:var(--muted);">Add a photo of this item</p>
+      </div>
+    </div>
+    <div class="toggle-wrap"><div><p style="font-size:13px;font-weight:500;">Available now</p><p style="font-size:11px;color:var(--muted);">Show this item to customers</p></div><button class="toggle"></button></div>
+  </div>
+  <div style="padding:12px 16px 20px;background:var(--card);border-top:0.5px solid var(--border);">
+    <button class="btnp" onclick="go('sv-dashboard')">Save item</button>
+  </div>
+</div>
+
+</div>
+
+<!-- Nav pills -->
+<div style="display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap;">
+  <button onclick="go('sv-welcome')" style="padding:6px 14px;border:0.5px solid var(--color-border-secondary);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);">Welcome</button>
+  <button onclick="go('sv-register')" style="padding:6px 14px;border:0.5px solid var(--color-border-secondary);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);">Register</button>
+  <button onclick="go('sv-dashboard')" style="padding:6px 14px;border:0.5px solid var(--color-border-secondary);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);">Dashboard</button>
+  <button onclick="go('sv-order-detail')" style="padding:6px 14px;border:0.5px solid var(--color-border-secondary);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);">Order detail</button>
+  <button onclick="go('sv-wallet')" style="padding:6px 14px;border:0.5px solid var(--color-border-secondary);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);">Wallet</button>
+  <button onclick="go('sv-settings')" style="padding:6px 14px;border:0.5px solid var(--color-border-secondary);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);">Store settings</button>
+</div>
+</div>
+
+<script>
+let regStep = 1;
+let storeOpen = true;
+
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) { el.classList.add('active'); el.scrollTop = 0; }
+}
+
+function regNext() {
+  if (regStep === 1) {
+    regStep = 2;
+    document.getElementById('reg-s1').style.display = 'none';
+    document.getElementById('reg-s2').style.display = '';
+    document.getElementById('reg-step-label').textContent = '2';
+    document.getElementById('reg-progress').style.width = '66%';
+    document.getElementById('reg-next-btn').textContent = 'Continue →';
+  } else if (regStep === 2) {
+    regStep = 3;
+    document.getElementById('reg-s2').style.display = 'none';
+    document.getElementById('reg-s3').style.display = '';
+    document.getElementById('reg-step-label').textContent = '3';
+    document.getElementById('reg-progress').style.width = '100%';
+    document.getElementById('reg-next-btn').textContent = 'Complete registration →';
+  } else {
+    go('sv-dashboard');
+    regStep = 1;
+  }
+}
+
+function addStorePhoto() {
+  const el = document.getElementById('store-photo');
+  el.innerHTML = '<p style="font-size:12px;color:var(--green);font-weight:500;">Photo uploaded ✓</p><p style="font-size:10px;color:var(--hint);margin-top:2px;">storefront.jpg</p>';
+  el.style.background = 'var(--green-bg)';
+  el.style.border = '1.5px dashed #B8E8CC';
+}
+
+function dashTab(n) {
+  document.getElementById('dash-t1').classList.toggle('on', n===1);
+  document.getElementById('dash-t2').classList.toggle('on', n===2);
+  document.getElementById('dash-orders').style.display = n===1 ? '' : 'none';
+  document.getElementById('dash-menu').style.display = n===2 ? '' : 'none';
+}
+
+function acceptOrder() {
+  const btn = event.target;
+  btn.textContent = 'Order accepted! Preparing now... ✓';
+  btn.style.background = 'var(--green)';
+  btn.disabled = true;
+  setTimeout(() => go('sv-dashboard'), 1200);
+}
+
+function toggleStore() {
+  storeOpen = !storeOpen;
+  const dot = document.getElementById('store-dot');
+  const lbl = document.getElementById('store-status');
+  if (storeOpen) {
+    dot.style.background = 'var(--green)';
+    lbl.style.color = 'var(--green)';
+    lbl.textContent = 'Open';
+    document.querySelector('#store-dot').parentElement.style.background = 'var(--green-bg)';
+  } else {
+    dot.style.background = 'var(--hint)';
+    lbl.style.color = 'var(--hint)';
+    lbl.textContent = 'Closed';
+    document.querySelector('#store-dot').parentElement.style.background = 'var(--surface)';
+  }
+}
+
+function toggleSettings() {
+  const t = document.getElementById('settings-toggle');
+  t.classList.toggle('off');
+}
+
+function doWithdraw() {
+  const btn = document.getElementById('wd-btn');
+  const bal = document.getElementById('vendor-bal');
+  btn.textContent = 'Withdrawal initiated ✓';
+  btn.style.background = 'var(--green)';
+  btn.disabled = true;
+  setTimeout(() => {
+    bal.textContent = '₦0.00';
+    setTimeout(() => {
+      bal.textContent = '₦47,350.00';
+      btn.textContent = 'Withdraw to GTBank ****7821';
+      btn.style.background = 'var(--orange)';
+      btn.disabled = false;
+    }, 2000);
+  }, 600);
+}
+</script>
